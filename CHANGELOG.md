@@ -13,6 +13,7 @@ Each release's notes on GitHub come from its section here (`## [X.Y.Z]`, see
 
 ### Fixed
 
+- **Download video**: a sound-only choice (MP3, Opus, FLAC, the original sound) saves in the Music category's folder and is listed under Music, as a playlist downloaded as sound only does; choosing a video again goes back to the Video folder. A folder you typed or picked in **Save to** stays as it is ([#611](https://github.com/anefzaoui/misterdownloadmanager/issues/611)).
 - **Download video** without ffmpeg (on macOS and Linux, where MDM doesn't install it): the sound alone comes from a format the site sends as one file when it has one, and a sound or video that came as an HLS stream's pieces is saved as what it is (`.aac`, `.ts`) instead of `.mp4`, which players refused to open ([#569](https://github.com/anefzaoui/misterdownloadmanager/issues/569)).
 - A freeze when the disk was slow: MDM looked on the disk for a portable data folder on every tick of the window; it now works the data folder out once ([#565](https://github.com/anefzaoui/misterdownloadmanager/issues/565)).
 - macOS 15 and later: Chinese names and text find the PingFang font again, which moved into the system's font assets, with Hiragino Sans GB and STHeiti as fallbacks ([#541](https://github.com/anefzaoui/misterdownloadmanager/issues/541)).
