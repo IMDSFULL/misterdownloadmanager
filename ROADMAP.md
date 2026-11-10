@@ -541,6 +541,8 @@ These ship in a later version, when they're ready.
   off for the test site, and timed out in a full run ([#480](https://github.com/anefzaoui/misterdownloadmanager/issues/480)): fix in review
 - 🔄 The video button vanishing over a hover-to-play preview (YouTube's thumbnails) before it
   can be clicked ([#503](https://github.com/anefzaoui/misterdownloadmanager/issues/503)): fix in review
+- 🔄 The Download video button on Instagram: scrolling the feed or the Reels tab sent the feed's
+  own address, not the post playing, and nothing could be downloaded; fix in review
 - 🔄 Add URL's **Use authorization** empty for an address with a login in Options → Sites
   Logins, though the download used it
   ([#511](https://github.com/anefzaoui/misterdownloadmanager/issues/511)): fix in review
