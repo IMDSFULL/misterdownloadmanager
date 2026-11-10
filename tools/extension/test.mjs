@@ -1184,6 +1184,40 @@ const MPD = (protect) => `<?xml version="1.0"?>
   assert.equal(at("https://www.youtube-nocookie.com/embed/dQw4w9WgXcQ?start=5"), "https://www.youtube.com/watch?v=dQw4w9WgXcQ");
   assert.equal(at("https://vimeo.com/123456789?list=abc"), "https://vimeo.com/123456789?list=abc");
   ok("#311: the button sends the video's own page, not the page playing it");
+  // Instagram's card links to its post nowhere near the video in the DOM (live-tested #?): the
+  // one playing is found by the post link closest to it on screen instead.
+  const ig = (href, { videoTop = 0, links = [] } = {}) => {
+    const document = {
+      querySelectorAll: (sel) =>
+        sel === "a[href]"
+          ? links.map(({ href, top }) => ({ getAttribute: () => href, getBoundingClientRect: () => ({ top }) }))
+          : [],
+      querySelector: () => null,
+    };
+    const video = { getBoundingClientRect: () => ({ top: videoTop }) };
+    const fn = new Function("location", "document", `${source.slice(start, end)}; return videoPage;`)({ href }, document);
+    return fn(video);
+  };
+  // Already a post's own page: no search needed.
+  assert.equal(ig("https://www.instagram.com/reel/Cabc123/"), "https://www.instagram.com/reel/Cabc123/");
+  // The feed: several posts' links on the page, the nearest one (by its position) is playing.
+  assert.equal(
+    ig("https://www.instagram.com/", {
+      videoTop: 20,
+      links: [
+        { href: "/reels/Cabc123/", top: 20 },
+        { href: "/p/Cabc123/", top: 32 },
+        { href: "/reels/audio/29737642545821623/", top: 26 },
+        { href: "/p/Cxyz999/", top: 600 },
+      ],
+    }),
+    "https://www.instagram.com/reels/Cabc123/",
+  );
+  // A reel's audio track page (a number, not a post's code): not mistaken for one.
+  assert.equal(ig("https://www.instagram.com/", { videoTop: 20, links: [{ href: "/reels/audio/29737642545821623/", top: 20 }] }), null);
+  // No post link anywhere on the page: nothing is sent, rather than the feed's own address.
+  assert.equal(ig("https://www.instagram.com/"), null);
+  ok("Instagram: the button sends the post's own page, not the feed playing it");
 }
 
 // A page that moves in place (history.pushState): the button sends the address it's at now, not

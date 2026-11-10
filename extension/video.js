@@ -114,6 +114,35 @@
         // A page that plays a video and names none: not the video's page, so not the app's.
         return null;
       }
+      // Instagram's feeds (home, the Reels tab, an explore page, a profile grid) keep one
+      // address while scrolling past many posts, each with its own video: not a post's own page
+      // then. Its card links to the post nowhere near the video in the DOM (unlike YouTube's),
+      // so the one playing is the post link closest to it on screen instead.
+      if (name === "instagram.com") {
+        // Not a post's code: a reel's audio track page (/reels/audio/<track id>/).
+        const NOT_A_CODE = new Set(["audio"]);
+        const post = (href) => {
+          const [kind, id] = (href || "").split("/").filter(Boolean);
+          return ["reel", "reels", "p", "tv"].includes(kind) &&
+            id &&
+            !NOT_A_CODE.has(id) &&
+            /^[\w-]+$/.test(id) &&
+            /[a-zA-Z]/.test(id)
+            ? new URL(href, location.href).href
+            : null;
+        };
+        if (post(url.pathname)) return location.href;
+        const vTop = v.getBoundingClientRect?.().top;
+        if (vTop === undefined) return null;
+        let nearest = null;
+        for (const a of document.querySelectorAll('a[href]')) {
+          const href = post(a.getAttribute("href"));
+          if (!href) continue;
+          const dy = Math.abs(a.getBoundingClientRect().top - vTop);
+          if (!nearest || dy < nearest.dy) nearest = { href, dy };
+        }
+        return nearest?.href ?? null;
+      }
     } catch {
       // Not an address this page can reason about: its own follows.
     }
